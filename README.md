@@ -58,3 +58,5 @@ Project code can be build with Maven build command (mvn clean install package), 
 
 Application can be run from command prompt with option java -jar advertiser-app*.jar
 
+Docker - In Progress.
+Docker Image build is in running state, But currently not responding on 8080. Need a relook.
