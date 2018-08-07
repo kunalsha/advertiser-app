@@ -2,12 +2,13 @@ package com.coding.exercise.advertiser.controller;
 
 import javax.validation.Valid;
 
-import org.h2.util.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,8 +24,12 @@ import com.coding.exercise.advertiser.exception.InvalidAdvertiserException;
 import com.coding.exercise.advertiser.service.AdvertiserService;
 import com.coding.exercise.advertiser.util.AdvertiserConstants;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+
 @RestController
 @RequestMapping("/api/advertiser")
+@Api(value = "Advertiser", description = "Endpoint for Advertiser management")
 public class AdvertiserController {
 
 	private static final org.slf4j.Logger logger = LoggerFactory.getLogger(AdvertiserController.class);
@@ -32,13 +37,70 @@ public class AdvertiserController {
 	@Autowired
 	private AdvertiserService advertiserService;
 
+	// POST new advertiser
+	@ApiOperation(value = "Create new Advertiser", notes = "Creates a new Advertiser from Advertiser object information passed", response = ResponseEntity.class)
+	@PostMapping(value = "", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<AdvertiserResponse> createAdvertiser(@RequestBody Advertiser advertiser) {
+
+		logger.info("Inside AdvertiserController.createAdvertiser, value of advertiserId is " + advertiser.getId());
+
+		if (!validateAdvertiser(advertiser))
+			throw new InvalidAdvertiserException(AdvertiserConstants.MSG_INVL_INPUT);
+
+		logger.info("Exiting AdvertiserController.createAdvertiser ");
+
+		return new ResponseEntity<AdvertiserResponse>(
+				new AdvertiserResponse(advertiserService.createAdvertiser(advertiser), null), HttpStatus.OK);
+	}
+
+	// PUT update advertiser
+	@ApiOperation(value = "Update an existing Advertiser", notes = "Update an existing Advertiser from Advertiser object information passed", response = ResponseEntity.class)
+	@PutMapping(value = "/{advertiserId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<AdvertiserResponse> updateAdvertiser(@Valid @RequestBody Advertiser advertiser,
+			@PathVariable(name = "advertiserId", required = true) String advertiserId) {
+
+		logger.info("Inside AdvertiserController.updateAdvertiser, value of advertiser is invalid ");
+
+		if (advertiser.getAdvName() == null || advertiser.getAdvName().trim().equals("")
+				|| advertiser.getAdvContactName() == null || advertiser.getAdvContactName().trim().equals("")
+				|| advertiser.getAdvCreditLimit() == null || !(StringUtils.isNumeric(advertiserId)))
+			throw new InvalidAdvertiserException(AdvertiserConstants.MSG_INVL_INPUT);
+
+		logger.info("Exiting AdvertiserController.updateAdvertiser");
+
+		return new ResponseEntity<AdvertiserResponse>(
+				new AdvertiserResponse(advertiserService.updateAdvertiser(advertiser, advertiserId), null),
+				HttpStatus.OK);
+	}
+
+	// DELETE advertiser
+	@ApiOperation(value = "Delete an existing Advertiser", notes = "Delete an existing Advertiser based on advertiser Id", response = ResponseEntity.class)
+	@DeleteMapping(value = "/{advertiserId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> deleteAdvertiser(
+			@Valid @PathVariable(name = "advertiserId", required = true) String advertiserId) {
+
+		logger.info("Inside AdvertiserController.deleteAdvertiser, value of advertiserId is " + advertiserId);
+
+		if (advertiserId == null || advertiserId.trim().equals("") || !(StringUtils.isNumeric(advertiserId)))
+			throw new InvalidAdvertiserException(
+					AdvertiserConstants.MSG_INVL_INPUT + advertiserId + AdvertiserConstants.MSG_INVL_INPUT1);
+
+		advertiserService.deleteAdvertiser(advertiserId);
+
+		logger.info("Exiting AdvertiserController.deleteAdvertiser");
+
+		return new ResponseEntity<>(null, HttpStatus.OK);
+	}
+
+	// GET advertiser
+	@ApiOperation(value = "Returns an existing Advertiser", notes = "Returns an existing Advertiser based on advertiser Id", response = ResponseEntity.class)
 	@GetMapping(value = "/{advertiserId}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<AdvertiserResponse> getAdvertiserById(
 			@Valid @PathVariable(name = "advertiserId", required = true) String advertiserId) {
 
 		logger.info("Inside AdvertiserController.getAdvertiserById, value of advertiserId is " + advertiserId);
 
-		if (advertiserId == null || advertiserId.trim().equals("") || !(StringUtils.isNumber(advertiserId)))
+		if (advertiserId == null || advertiserId.trim().equals("") || !(StringUtils.isNumeric(advertiserId)))
 			throw new InvalidAdvertiserException(
 					AdvertiserConstants.MSG_INVL_INPUT + advertiserId + AdvertiserConstants.MSG_INVL_INPUT1);
 
@@ -48,43 +110,29 @@ public class AdvertiserController {
 				new AdvertiserResponse(advertiserService.getAdvertiserById(advertiserId), null), HttpStatus.OK);
 	}
 
+	// GET endpoint to validate if the advertiser has enough credit to perform a
+	// transaction
+	@ApiOperation(value = "Returns status of credit to perform a transaction", notes = "Returns status of credit to perform a transaction based on credit limit of advertiser Id", response = ResponseEntity.class)
 	@GetMapping(value = "/{advertiserId}/validate", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<ValidatorResponse> validateAdvertiserByCredit(
 			@PathVariable(name = "advertiserId", required = true) String advertiserId) {
 
-		if (advertiserId == null || advertiserId.trim().equals("") || !(StringUtils.isNumber(advertiserId)))
+		logger.info("Inside AdvertiserController.validateAdvertiserByCredit, value of advertiserId is " + advertiserId);
+
+		if (advertiserId == null || advertiserId.trim().equals("") || !(StringUtils.isNumeric(advertiserId)))
 			throw new InvalidAdvertiserException(
 					AdvertiserConstants.MSG_INVL_INPUT + advertiserId + AdvertiserConstants.MSG_INVL_INPUT1);
+
+		logger.info("Exiting AdvertiserController.validateAdvertiserByCredit");
 
 		return new ResponseEntity<ValidatorResponse>(
 				new ValidatorResponse(advertiserService.validateAdvertiser(advertiserId)), HttpStatus.OK);
 	}
 
-	@PutMapping(value = "/{advertiserId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<AdvertiserResponse> updateAdvertiser(@Valid @RequestBody Advertiser advertiser,
-			@PathVariable(name = "advertiserId", required = true) String advertiserId) {
-
-		if (advertiser.getAdvName() == null || advertiser.getAdvName().trim().equals("")
-				|| advertiser.getAdvContactName() == null || advertiser.getAdvContactName().trim().equals("")
-				|| advertiser.getAdvCreditLimit() == null || !(StringUtils.isNumber(advertiserId)))
-			throw new InvalidAdvertiserException(AdvertiserConstants.MSG_INVL_INPUT);
-
-		return new ResponseEntity<AdvertiserResponse>(
-				new AdvertiserResponse(advertiserService.updateAdvertiser(advertiser, advertiserId), null),
-				HttpStatus.OK);
-	}
-
-	@PostMapping(value = "", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<AdvertiserResponse> createAdvertiser(@RequestBody Advertiser advertiser) {
-
-		if (!validateAdvertiser(advertiser))
-			throw new InvalidAdvertiserException(AdvertiserConstants.MSG_INVL_INPUT);
-
-		return new ResponseEntity<AdvertiserResponse>(
-				new AdvertiserResponse(advertiserService.createAdvertiser(advertiser), null), HttpStatus.OK);
-	}
-
 	public boolean validateAdvertiser(Advertiser advertiser) {
+
+		logger.info("Inside AdvertiserController.validateAdvertiser");
+
 		if (advertiser.getAdvName() == null || advertiser.getAdvName().trim().equals("")
 				|| advertiser.getAdvContactName() == null || advertiser.getAdvContactName().trim().equals("")
 				|| advertiser.getAdvCreditLimit() == null)

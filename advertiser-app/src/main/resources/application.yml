@@ -23,3 +23,12 @@ spring:
         show_sql: true
         use_sql_comments: true
         format_sql: true
+
+## Configuring info endpoint
+info:
+  app:
+    name: Advertiser-App
+    description: CRUD Spring boot application
+    version: 1.0.0-RELEASE 
+  java-vendor: ${java.specification.vendor}
+    

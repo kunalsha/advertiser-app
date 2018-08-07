@@ -11,37 +11,44 @@ import javax.validation.constraints.Positive;
 import org.springframework.format.annotation.NumberFormat;
 
 /**
- * Advertiser is the Entity class corresponding to Advertiser table
- * Created by Kunal Sharma
+ * Advertiser is the Entity class corresponding to Advertiser table Created by
+ * Kunal Sharma
  */
 @Entity
-@Table(name="Advertiser")
+@Table(name = "Advertiser")
 public class Advertiser {
-	
+
 	@javax.persistence.Id
-	@GeneratedValue(strategy=GenerationType.AUTO)
-	@Column(name="id")
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	@Column(name = "id")
 	@NumberFormat
 	private Long Id;
-	
+
 	@NotBlank
-	@Column(name="name")
+	@Column(name = "advertiser_name")
 	private String advName;
 
-	
-	@Column(name="contact_name")
+	@Column(name = "advertiser_contact_name")
 	private String advContactName;
-	
+
 	@Positive
-	@Column(name="credit_limit")
+	@Column(name = "advertiser_credit_limit")
 	private Double advCreditLimit;
-	
+
 	public Advertiser() {
 		super();
 	}
 
 	public Advertiser(String advName, String advContactName, Double advCreditLimit) {
 		super();
+		this.advName = advName;
+		this.advContactName = advContactName;
+		this.advCreditLimit = advCreditLimit;
+	}
+
+	public Advertiser(Long id, @NotBlank String advName, String advContactName, @Positive Double advCreditLimit) {
+		super();
+		Id = id;
 		this.advName = advName;
 		this.advContactName = advContactName;
 		this.advCreditLimit = advCreditLimit;
@@ -78,11 +85,4 @@ public class Advertiser {
 	public void setAdvCreditLimit(Double advCreditLimit) {
 		this.advCreditLimit = advCreditLimit;
 	}
-
-	@Override
-	public String toString() {
-		return "Advertiser [Id=" + Id + ", advName=" + advName + ", advContactName=" + advContactName
-				+ ", advCreditLimit=" + advCreditLimit + "]";
-	}
-
 }

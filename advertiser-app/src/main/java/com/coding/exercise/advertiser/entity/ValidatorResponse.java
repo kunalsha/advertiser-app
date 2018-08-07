@@ -1,28 +1,23 @@
 package com.coding.exercise.advertiser.entity;
 
 /**
- * ValidatorResponse is the DTO class
- * Created by Kunal Sharma
+ * ValidatorResponse is the DTO class Created by Kunal Sharma
  */
 public class ValidatorResponse {
 
-	private boolean validCreditLimit;
+	private boolean creditToPerformTransaction;
 
-	public ValidatorResponse(boolean validCreditLimit) {
+	public ValidatorResponse(boolean creditToPerformTransaction) {
 		super();
-		this.validCreditLimit = validCreditLimit;
+		this.creditToPerformTransaction = creditToPerformTransaction;
 	}
 
-	public boolean isValidCreditLimit() {
-		return validCreditLimit;
+	public boolean isCreditToPerformTransactiont() {
+
+		return creditToPerformTransaction;
 	}
 
-	public void setValidCreditLimit(boolean validCreditLimit) {
-		this.validCreditLimit = validCreditLimit;
-	}
-
-	@Override
-	public String toString() {
-		return "AdvertiserResponse [validCreditLimit=" + validCreditLimit + "]";
+	public void setCreditToPerformTransaction(boolean creditToPerformTransaction) {
+		this.creditToPerformTransaction = creditToPerformTransaction;
 	}
 }
