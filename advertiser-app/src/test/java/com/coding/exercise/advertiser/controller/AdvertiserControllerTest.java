@@ -10,6 +10,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.http.ResponseEntity;
 import com.coding.exercise.advertiser.entity.Advertiser;
 import com.coding.exercise.advertiser.entity.AdvertiserResponse;
+import com.coding.exercise.advertiser.entity.CreditEntry;
 import com.coding.exercise.advertiser.entity.ValidatorResponse;
 import com.coding.exercise.advertiser.exception.AdvertiserNotFoundException;
 import com.coding.exercise.advertiser.exception.InvalidAdvertiserException;
@@ -135,6 +136,29 @@ public class AdvertiserControllerTest {
 
 		advertiserController.updateAdvertiser(advertiser, "1");
 
+	}
+	
+	@Test
+	public void deductCreditTest() throws Exception {
+		Advertiser advertiserResp = new Advertiser(3L, "Adv-Name3", "Adv-Contact-Name3", 7065.10);
+
+		Mockito.when(advertiserService.deductCredit("3", 500.00)).thenReturn(advertiserResp);
+		
+		CreditEntry entry = new CreditEntry(500.00);
+
+		ResponseEntity<AdvertiserResponse> response = advertiserController.deductCredit(entry, "3");
+
+		Assert.assertEquals(advertiserResp.getAdvCreditLimit(), response.getBody().getAdvertiser().getAdvCreditLimit());
+	}
+
+	@Test(expected = AdvertiserNotFoundException.class)
+	public void deductCreditTestException() throws Exception {
+		Mockito.when(advertiserService.deductCredit("10", 500.00))
+				.thenThrow(new AdvertiserNotFoundException(AdvertiserConstants.MSG_NO_ADV));
+
+		CreditEntry entry = new CreditEntry(500.00);
+
+		advertiserController.deductCredit(entry, "10");
 	}
 
 	@Test

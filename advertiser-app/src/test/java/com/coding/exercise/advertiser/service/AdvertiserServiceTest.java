@@ -80,6 +80,25 @@ public class AdvertiserServiceTest {
 		assertEquals(advertiserResp.getAdvCreditLimit(), response.getAdvCreditLimit());
 
 	}
+	
+	@Test
+	public void deductCreditTest() {
+		
+		Advertiser advertiser = new Advertiser(3L, "Adv-Name31", "Adv-Contact-Name31", 75151.10);
+
+		Optional<Advertiser> adv = Optional.of(new Advertiser(3L, "Adv-Name3", "Adv-Contact-Name3", 7565.10));
+
+		when(repo.findById(3L)).thenReturn(adv);
+
+		when(repo.save(Mockito.any(Advertiser.class))).thenReturn(advertiser);
+
+		Advertiser response = advertiserService.deductCredit("3", 500.00);
+
+		assertEquals(advertiser.getAdvContactName(), response.getAdvContactName());
+		assertEquals(advertiser.getAdvName(), response.getAdvName());
+		assertEquals(advertiser.getAdvCreditLimit(), response.getAdvCreditLimit());
+
+	}
 
 	@Test
 	public void updateAdvertiserTest() {

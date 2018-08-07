@@ -31,4 +31,7 @@ info:
     description: CRUD Spring boot application
     version: 1.0.0-RELEASE 
   java-vendor: ${java.specification.vendor}
-    
+
+management:
+  server:
+    port: 8090

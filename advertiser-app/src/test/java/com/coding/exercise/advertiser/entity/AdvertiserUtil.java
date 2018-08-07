@@ -53,7 +53,15 @@ public class AdvertiserUtil {
 
 		resp.setCreditToPerformTransaction(true);
 		Assert.assertEquals(true, resp.isCreditToPerformTransactiont());
-		Assert.assertEquals(null, resp.isCreditToPerformTransactiont());
+
+	}
+	
+	@Test
+	public void CreditEntry_Test() {
+		CreditEntry resp = new CreditEntry();
+
+		resp.setAdvCreditAmount(500.00);
+		Assert.assertEquals(500.00, resp.getAdvCreditAmount(),0.00);
 
 	}
 }

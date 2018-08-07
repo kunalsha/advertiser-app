@@ -88,4 +88,26 @@ public class AdvertiserService {
 
 		repo.deleteById(Long.parseLong(advertiserId));
 	}
+
+	public Advertiser deductCredit(String advertiserId, double advCreditEntry) {
+		logger.info("Inside AdvertiserRepository.deductCredit, value of advertiserId is " + advertiserId);
+
+		Advertiser newAdv = repo.findById(Long.parseLong(advertiserId))
+				.orElseThrow(() -> new AdvertiserNotFoundException(AdvertiserConstants.MSG_NO_ADV));
+
+		if (newAdv == null)
+			throw new AdvertiserNotFoundException(AdvertiserConstants.MSG_NO_ADV);
+
+		double newCredit = newAdv.getAdvCreditLimit() - advCreditEntry;
+		newAdv.setAdvCreditLimit(newCredit);
+
+		Advertiser result = repo.save(newAdv);
+
+		if (result == null)
+			throw new AdvertiserDBException(AdvertiserConstants.MSG_UPDT_FAILED);
+
+		logger.info("Exiting AdvertiserRepository.deductCredit");
+
+		return result;
+	}
 }

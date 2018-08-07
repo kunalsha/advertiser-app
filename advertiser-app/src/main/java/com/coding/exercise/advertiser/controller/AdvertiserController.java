@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.coding.exercise.advertiser.entity.Advertiser;
 import com.coding.exercise.advertiser.entity.AdvertiserResponse;
+import com.coding.exercise.advertiser.entity.CreditEntry;
 import com.coding.exercise.advertiser.entity.ValidatorResponse;
 import com.coding.exercise.advertiser.exception.InvalidAdvertiserException;
 import com.coding.exercise.advertiser.service.AdvertiserService;
@@ -51,6 +52,19 @@ public class AdvertiserController {
 
 		return new ResponseEntity<AdvertiserResponse>(
 				new AdvertiserResponse(advertiserService.createAdvertiser(advertiser), null), HttpStatus.OK);
+	}
+
+	// POST deduct credit from the advertiser’s account
+	@ApiOperation(value = "Deduct credit from the advertiser’s account", notes = "Deduct credit from the advertiser’s account", response = ResponseEntity.class)
+	@PostMapping(value = "/{advertiserId}/deduct", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<AdvertiserResponse> deductCredit(@RequestBody CreditEntry creditEntry,
+			@PathVariable(name = "advertiserId", required = true) String advertiserId) {
+
+		logger.info("Inside AdvertiserController.deductCredit, value of advertiserId is "
+				+ creditEntry.getAdvCreditAmount());
+
+		return new ResponseEntity<AdvertiserResponse>(new AdvertiserResponse(
+				advertiserService.deductCredit(advertiserId, creditEntry.getAdvCreditAmount()), null), HttpStatus.OK);
 	}
 
 	// PUT update advertiser
